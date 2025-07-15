@@ -7,65 +7,307 @@ import numpy as np
 
 # 페이지 설정
 st.set_page_config(
-    page_title="기업의 경제적 지속발전 가능성",
-    page_icon="📈",
+    page_title="기업의 경제적 지속발전 가능성 - 위키",
+    page_icon="📚",
     layout="wide"
 )
 
-# 메인 제목
-st.title("📈 기업의 경제적 지속발전 가능성")
-st.markdown("---")
+# 위키피디아 스타일 CSS
+st.markdown("""
+<style>
+    .main-title {
+        font-family: "Linux Libertine", Georgia, Times, serif;
+        font-size: 2.5rem;
+        font-weight: normal;
+        border-bottom: 3px solid #a2a9b1;
+        padding-bottom: 10px;
+        margin-bottom: 20px;
+        color: #000;
+    }
+    
+    .wiki-header {
+        font-family: "Linux Libertine", Georgia, Times, serif;
+        font-size: 1.8rem;
+        font-weight: normal;
+        border-bottom: 1px solid #a2a9b1;
+        padding-bottom: 5px;
+        margin-top: 30px;
+        margin-bottom: 15px;
+        color: #000;
+    }
+    
+    .wiki-subheader {
+        font-family: "Linux Libertine", Georgia, Times, serif;
+        font-size: 1.4rem;
+        font-weight: normal;
+        margin-top: 25px;
+        margin-bottom: 10px;
+        color: #000;
+    }
+    
+    .wiki-text {
+        font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+        font-size: 14px;
+        line-height: 1.6;
+        color: #202122;
+        text-align: justify;
+    }
+    
+    .wiki-toc {
+        background-color: #f8f9fa;
+        border: 1px solid #a2a9b1;
+        padding: 15px;
+        margin: 20px 0;
+        border-radius: 3px;
+    }
+    
+    .wiki-toc-title {
+        font-family: "Linux Libertine", Georgia, Times, serif;
+        font-size: 1.2rem;
+        font-weight: bold;
+        margin-bottom: 10px;
+        color: #000;
+    }
+    
+    .wiki-infobox {
+        background-color: #f8f9fa;
+        border: 1px solid #a2a9b1;
+        padding: 15px;
+        margin: 20px 0;
+        border-radius: 3px;
+        width: 100%;
+    }
+    
+    .wiki-infobox-title {
+        font-family: "Linux Libertine", Georgia, Times, serif;
+        font-size: 1.1rem;
+        font-weight: bold;
+        text-align: center;
+        background-color: #ccccff;
+        padding: 8px;
+        margin: -15px -15px 15px -15px;
+        border-radius: 3px 3px 0 0;
+    }
+    
+    .wiki-reference {
+        font-size: 11px;
+        color: #0645ad;
+        text-decoration: none;
+    }
+    
+    .wiki-note {
+        background-color: #f6f6f6;
+        border-left: 4px solid #36c;
+        padding: 10px 15px;
+        margin: 15px 0;
+        font-style: italic;
+        border-radius: 0 3px 3px 0;
+    }
+    
+    .wiki-table {
+        border-collapse: collapse;
+        width: 100%;
+        background-color: #f8f9fa;
+        border: 1px solid #a2a9b1;
+        margin: 10px 0;
+    }
+    
+    .wiki-table th {
+        background-color: #ccccff;
+        padding: 8px;
+        border: 1px solid #a2a9b1;
+        font-weight: bold;
+    }
+    
+    .wiki-table td {
+        padding: 8px;
+        border: 1px solid #a2a9b1;
+    }
+    
+    .sidebar .sidebar-content {
+        background-color: #f8f9fa;
+        border: 1px solid #a2a9b1;
+        padding: 15px;
+        border-radius: 3px;
+    }
+    
+    .wiki-category {
+        background-color: #f8f9fa;
+        border: 1px solid #a2a9b1;
+        padding: 10px;
+        margin: 20px 0;
+        border-radius: 3px;
+        font-size: 12px;
+    }
+    
+    .wiki-disambiguation {
+        background-color: #f8f9fa;
+        border: 1px solid #a2a9b1;
+        padding: 10px;
+        margin: 10px 0;
+        border-radius: 3px;
+        font-style: italic;
+    }
+</style>
+""", unsafe_allow_html=True)
 
-# 사이드바 메뉴
-st.sidebar.title("🎯 메뉴")
+# 메인 제목
+st.markdown('<h1 class="main-title">기업의 경제적 지속발전 가능성</h1>', unsafe_allow_html=True)
+
+# 위키 스타일 disambiguation
+st.markdown("""
+<div class="wiki-disambiguation">
+이 문서는 <strong>기업의 경제적 지속발전 가능성</strong>에 관한 것입니다. 
+다른 의미의 지속가능성에 대해서는 <a href="#" class="wiki-reference">지속가능성 (동음이의)</a>를 참조하십시오.
+</div>
+""", unsafe_allow_html=True)
+
+# 사이드바 - 위키 스타일 네비게이션
+st.sidebar.markdown("""
+<div style="background-color: #f8f9fa; border: 1px solid #a2a9b1; padding: 15px; border-radius: 3px;">
+<h3 style="margin-top: 0; color: #000; font-family: 'Linux Libertine', Georgia, Times, serif;">목차</h3>
+</div>
+""", unsafe_allow_html=True)
+
 menu = st.sidebar.radio(
-    "선택하세요:",
-    ["개요", "핵심 전략", "성과 지표", "자가진단", "실행 계획", "성공 사례"]
+    "",
+    ["1. 개요", "2. 핵심 전략", "3. 성과 지표", "4. 자가진단", "5. 실행 계획", "6. 성공 사례"],
+    label_visibility="collapsed"
 )
 
+# 목차 (Table of Contents)
+if menu == "1. 개요":
+    st.markdown("""
+    <div class="wiki-toc">
+        <div class="wiki-toc-title">목차</div>
+        <div class="wiki-text">
+        <strong>1.</strong> 개요<br>
+        <strong>1.1</strong> 정의<br>
+        <strong>1.2</strong> 핵심 원칙<br>
+        <strong>1.3</strong> 구성 요소<br>
+        <strong>1.4</strong> 중요성<br>
+        <strong>2.</strong> 핵심 전략<br>
+        <strong>3.</strong> 성과 지표<br>
+        <strong>4.</strong> 자가진단<br>
+        <strong>5.</strong> 실행 계획<br>
+        <strong>6.</strong> 성공 사례
+        </div>
+    </div>
+    """, unsafe_allow_html=True)
+
 # 메인 콘텐츠
-if menu == "개요":
-    st.header("🌟 경제적 지속발전 가능성이란?")
+if menu == "1. 개요":
+    # 인포박스
+    st.markdown("""
+    <div class="wiki-infobox">
+        <div class="wiki-infobox-title">기업의 경제적 지속발전 가능성</div>
+        <table class="wiki-table">
+            <tr><th>분야</th><td>경영학, 경제학</td></tr>
+            <tr><th>관련 개념</th><td>지속가능경영, ESG, 기업가치</td></tr>
+            <tr><th>주요 지표</th><td>ROE, 매출성장률, 혁신지수</td></tr>
+            <tr><th>관련 이론</th><td>이해관계자 이론, 자원기반이론</td></tr>
+        </table>
+    </div>
+    """, unsafe_allow_html=True)
     
-    col1, col2 = st.columns(2)
+    st.markdown('<h2 class="wiki-header">1. 개요</h2>', unsafe_allow_html=True)
+    
+    st.markdown("""
+    <div class="wiki-text">
+    <strong>기업의 경제적 지속발전 가능성</strong>(Corporate Economic Sustainability)은 기업이 
+    장기적으로 수익성을 유지하면서도 혁신과 효율성을 통해 지속적인 경쟁력을 확보하는 능력을 
+    의미한다. 이는 단순한 단기적 이익 추구가 아닌, 장기적 가치 창출에 중점을 두는 경영 철학이다.
+    </div>
+    """, unsafe_allow_html=True)
+    
+    st.markdown('<h3 class="wiki-subheader">1.1 정의</h3>', unsafe_allow_html=True)
+    
+    st.markdown("""
+    <div class="wiki-text">
+    경제적 지속가능성은 기업이 현재의 경제적 성과를 달성하면서도 미래 세대의 필요를 충족할 수 있는 
+    능력을 손상시키지 않는 방식으로 사업을 운영하는 것을 의미한다. 이는 다음과 같은 특징을 갖는다:
+    </div>
+    """, unsafe_allow_html=True)
+    
+    col1, col2 = st.columns([2, 1])
     
     with col1:
         st.markdown("""
-        ### 정의
-        기업이 **장기적으로 수익성을 유지**하면서도 **혁신과 효율성**을 통해 
-        지속적인 경쟁력을 확보하는 능력입니다.
-        
-        ### 핵심 원칙
-        - 📊 **장기적 가치 창출**
-        - 🔄 **지속가능한 비즈니스 모델**
-        - 💡 **혁신과 적응력**
-        - 🤝 **이해관계자 가치 균형**
-        """)
+        <div class="wiki-text">
+        <ul>
+        <li><strong>장기적 관점</strong>: 단기적 이익보다 장기적 가치 창출 우선</li>
+        <li><strong>혁신 중심</strong>: 지속적인 혁신을 통한 경쟁력 확보</li>
+        <li><strong>효율성 추구</strong>: 자원의 최적 활용과 운영 효율성 극대화</li>
+        <li><strong>이해관계자 고려</strong>: 모든 이해관계자의 가치 균형 추구</li>
+        </ul>
+        </div>
+        """, unsafe_allow_html=True)
     
     with col2:
         # 지속가능성 요소 파이 차트
         labels = ['경제적 성과', '혁신 역량', '운영 효율성', '리스크 관리', '이해관계자 관계']
         values = [25, 20, 20, 15, 20]
-        colors = ['#FF6B6B', '#4ECDC4', '#45B7D1', '#FFA07A', '#98D8C8']
+        colors = ['#e8f4f8', '#d4edda', '#fff3cd', '#f8d7da', '#e2e3e5']
         
-        fig = px.pie(values=values, names=labels, title="경제적 지속가능성 구성요소",
+        fig = px.pie(values=values, names=labels, 
+                     title="<b>구성 요소</b>",
                      color_discrete_sequence=colors)
+        fig.update_layout(
+            font=dict(family="Helvetica Neue, Helvetica, Arial, sans-serif", size=12),
+            title_font_size=14,
+            width=400,
+            height=300
+        )
         st.plotly_chart(fig, use_container_width=True)
     
-    st.markdown("---")
+    st.markdown('<h3 class="wiki-subheader">1.2 핵심 원칙</h3>', unsafe_allow_html=True)
     
-    # 중요성 설명
-    st.subheader("🎯 왜 중요한가?")
+    st.markdown("""
+    <div class="wiki-text">
+    기업의 경제적 지속발전 가능성은 다음과 같은 핵심 원칙들에 기반한다:
+    </div>
+    """, unsafe_allow_html=True)
+    
+    principles_data = {
+        "원칙": ["장기적 가치 창출", "지속가능한 비즈니스 모델", "혁신과 적응력", "이해관계자 가치 균형"],
+        "설명": [
+            "단기적 이익보다 장기적 가치 창출을 우선시하는 경영 철학",
+            "환경 변화에 적응할 수 있는 유연하고 견고한 비즈니스 모델 구축",
+            "지속적인 혁신을 통해 변화하는 시장 환경에 적응하는 능력",
+            "주주뿐만 아니라 모든 이해관계자의 가치를 고려하는 균형 잡힌 접근"
+        ]
+    }
+    
+    principles_df = pd.DataFrame(principles_data)
+    st.markdown("""
+    <div class="wiki-text">
+    <table class="wiki-table">
+        <tr><th>원칙</th><th>설명</th></tr>
+        <tr><td>장기적 가치 창출</td><td>단기적 이익보다 장기적 가치 창출을 우선시하는 경영 철학</td></tr>
+        <tr><td>지속가능한 비즈니스 모델</td><td>환경 변화에 적응할 수 있는 유연하고 견고한 비즈니스 모델 구축</td></tr>
+        <tr><td>혁신과 적응력</td><td>지속적인 혁신을 통해 변화하는 시장 환경에 적응하는 능력</td></tr>
+        <tr><td>이해관계자 가치 균형</td><td>주주뿐만 아니라 모든 이해관계자의 가치를 고려하는 균형 잡힌 접근</td></tr>
+    </table>
+    </div>
+    """, unsafe_allow_html=True)
+    
+    st.markdown('<h3 class="wiki-subheader">1.3 중요성</h3>', unsafe_allow_html=True)
+    
+    st.markdown("""
+    <div class="wiki-note">
+    <strong>주의:</strong> 경제적 지속가능성의 부족은 기업의 장기적 생존을 위협할 수 있다.
+    </div>
+    """, unsafe_allow_html=True)
     
     importance_data = {
-        "장점": [
+        "지속가능성 확보 시": [
             "장기적 수익성 확보",
             "경쟁 우위 유지",
             "투자자 신뢰 증대",
             "시장 변화 대응력 향상",
             "브랜드 가치 상승"
         ],
-        "위험": [
+        "지속가능성 부족 시": [
             "단기적 수익 추구로 인한 장기 손실",
             "혁신 부족으로 인한 경쟁력 상실",
             "지속불가능한 비즈니스 모델",
@@ -77,20 +319,45 @@ if menu == "개요":
     col1, col2 = st.columns(2)
     
     with col1:
-        st.success("✅ 지속가능성 확보 시")
-        for benefit in importance_data["장점"]:
-            st.write(f"• {benefit}")
+        st.markdown("""
+        <div class="wiki-text">
+        <h4>✓ 확보 시 장점</h4>
+        <ul>
+        <li>장기적 수익성 확보</li>
+        <li>경쟁 우위 유지</li>
+        <li>투자자 신뢰 증대</li>
+        <li>시장 변화 대응력 향상</li>
+        <li>브랜드 가치 상승</li>
+        </ul>
+        </div>
+        """, unsafe_allow_html=True)
     
     with col2:
-        st.error("❌ 지속가능성 부족 시")
-        for risk in importance_data["위험"]:
-            st.write(f"• {risk}")
+        st.markdown("""
+        <div class="wiki-text">
+        <h4>✗ 부족 시 위험</h4>
+        <ul>
+        <li>단기적 수익 추구로 인한 장기 손실</li>
+        <li>혁신 부족으로 인한 경쟁력 상실</li>
+        <li>지속불가능한 비즈니스 모델</li>
+        <li>이해관계자 불신</li>
+        <li>시장 변화 적응 실패</li>
+        </ul>
+        </div>
+        """, unsafe_allow_html=True)
 
-elif menu == "핵심 전략":
-    st.header("🚀 핵심 전략")
+elif menu == "2. 핵심 전략":
+    st.markdown('<h2 class="wiki-header">2. 핵심 전략</h2>', unsafe_allow_html=True)
+    
+    st.markdown("""
+    <div class="wiki-text">
+    기업의 경제적 지속발전 가능성을 확보하기 위한 핵심 전략은 크게 네 가지 영역으로 구분할 수 있다. 
+    각 전략은 상호 연관성을 가지며, 통합적으로 접근할 때 최대의 효과를 발휘한다.
+    </div>
+    """, unsafe_allow_html=True)
     
     strategies = {
-        "혁신과 기술 개발": {
+        "2.1 혁신과 기술 개발": {
             "description": "지속적인 연구개발과 기술 혁신을 통한 경쟁력 확보",
             "methods": [
                 "R&D 투자 확대",
@@ -99,9 +366,9 @@ elif menu == "핵심 전략":
                 "혁신 문화 조성",
                 "오픈 이노베이션 추진"
             ],
-            "color": "#FF6B6B"
+            "details": "혁신과 기술 개발은 기업의 장기적 경쟁력 확보를 위한 핵심 전략이다. 이는 단순한 기술 도입이 아닌, 조직 전체의 혁신 역량을 강화하는 포괄적 접근을 의미한다."
         },
-        "운영 효율성 향상": {
+        "2.2 운영 효율성 향상": {
             "description": "프로세스 최적화와 자원 활용 효율성 제고",
             "methods": [
                 "프로세스 자동화",
@@ -110,9 +377,9 @@ elif menu == "핵심 전략":
                 "에너지 효율성 개선",
                 "비용 구조 개선"
             ],
-            "color": "#4ECDC4"
+            "details": "운영 효율성 향상은 기업의 비용 경쟁력 확보와 수익성 개선을 위한 필수 요소이다. 이는 기술적 개선뿐만 아니라 조직 운영 방식의 전반적인 혁신을 포함한다."
         },
-        "시장 다각화": {
+        "2.3 시장 다각화": {
             "description": "새로운 시장 진출과 제품 포트폴리오 다양화",
             "methods": [
                 "신시장 개척",
@@ -121,9 +388,9 @@ elif menu == "핵심 전략":
                 "글로벌 진출",
                 "파트너십 구축"
             ],
-            "color": "#45B7D1"
+            "details": "시장 다각화는 기업의 리스크를 분산하고 새로운 성장 동력을 확보하는 전략이다. 이는 기존 사업 영역의 확장과 새로운 영역으로의 진출을 모두 포함한다."
         },
-        "인재 개발": {
+        "2.4 인재 개발": {
             "description": "핵심 인재 확보와 역량 강화를 통한 조직 경쟁력 제고",
             "methods": [
                 "교육 훈련 강화",
@@ -132,60 +399,97 @@ elif menu == "핵심 전략":
                 "조직 문화 개선",
                 "인재 유치 및 유지"
             ],
-            "color": "#FFA07A"
+            "details": "인재 개발은 기업의 모든 전략 실행의 기반이 되는 핵심 요소이다. 우수한 인재 없이는 어떤 전략도 성공할 수 없다는 점에서 그 중요성이 더욱 크다."
         }
     }
     
     for strategy, details in strategies.items():
-        with st.expander(f"📋 {strategy}"):
-            st.markdown(f"**개념:** {details['description']}")
-            st.markdown("**주요 실행 방법:**")
-            for method in details['methods']:
-                st.write(f"• {method}")
+        st.markdown(f'<h3 class="wiki-subheader">{strategy}</h3>', unsafe_allow_html=True)
+        
+        st.markdown(f"""
+        <div class="wiki-text">
+        <p><strong>개념:</strong> {details['description']}</p>
+        <p>{details['details']}</p>
+        </div>
+        """, unsafe_allow_html=True)
+        
+        st.markdown("""
+        <div class="wiki-text">
+        <strong>주요 실행 방법:</strong>
+        <ul>
+        """, unsafe_allow_html=True)
+        
+        for method in details['methods']:
+            st.markdown(f"<li>{method}</li>", unsafe_allow_html=True)
+        
+        st.markdown("</ul></div>", unsafe_allow_html=True)
 
-elif menu == "성과 지표":
-    st.header("📊 성과 지표 (KPI)")
+elif menu == "3. 성과 지표":
+    st.markdown('<h2 class="wiki-header">3. 성과 지표</h2>', unsafe_allow_html=True)
+    
+    st.markdown("""
+    <div class="wiki-text">
+    기업의 경제적 지속발전 가능성을 측정하고 관리하기 위해서는 적절한 성과 지표(Key Performance Indicators, KPI)의 
+    설정과 모니터링이 필수적이다. 이러한 지표들은 재무적 성과뿐만 아니라 비재무적 성과까지 포괄하여 
+    기업의 지속가능성을 다각도로 평가할 수 있도록 한다.
+    </div>
+    """, unsafe_allow_html=True)
     
     # 지표 카테고리
     kpi_categories = {
-        "재무 지표": [
-            {"name": "매출 성장률", "description": "지속적인 매출 증가율", "target": "연 5-10%"},
-            {"name": "수익성 (ROE)", "description": "자기자본 수익률", "target": "15% 이상"},
-            {"name": "현금 흐름", "description": "영업 현금 흐름", "target": "양수 유지"},
-            {"name": "부채 비율", "description": "총 부채 / 총 자본", "target": "50% 이하"}
+        "3.1 재무 지표": [
+            {"name": "매출 성장률", "description": "지속적인 매출 증가율", "target": "연 5-10%", "formula": "(당기매출 - 전기매출) / 전기매출 × 100"},
+            {"name": "수익성 (ROE)", "description": "자기자본 수익률", "target": "15% 이상", "formula": "당기순이익 / 평균자기자본 × 100"},
+            {"name": "현금 흐름", "description": "영업 현금 흐름", "target": "양수 유지", "formula": "영업활동현금흐름 / 매출액 × 100"},
+            {"name": "부채 비율", "description": "총 부채 / 총 자본", "target": "50% 이하", "formula": "총부채 / 총자본 × 100"}
         ],
-        "혁신 지표": [
-            {"name": "R&D 투자율", "description": "매출 대비 R&D 투자 비율", "target": "3-5%"},
-            {"name": "신제품 매출 비중", "description": "신제품 매출 / 총 매출", "target": "20% 이상"},
-            {"name": "특허 출원 건수", "description": "연간 특허 출원 수", "target": "지속적 증가"},
-            {"name": "디지털 성숙도", "description": "디지털 전환 수준", "target": "4점/5점"}
+        "3.2 혁신 지표": [
+            {"name": "R&D 투자율", "description": "매출 대비 R&D 투자 비율", "target": "3-5%", "formula": "R&D 투자액 / 매출액 × 100"},
+            {"name": "신제품 매출 비중", "description": "신제품 매출 / 총 매출", "target": "20% 이상", "formula": "신제품매출 / 총매출 × 100"},
+            {"name": "특허 출원 건수", "description": "연간 특허 출원 수", "target": "지속적 증가", "formula": "당해연도 특허출원건수"},
+            {"name": "디지털 성숙도", "description": "디지털 전환 수준", "target": "4점/5점", "formula": "디지털전환지수 (5점척도)"}
         ],
-        "운영 지표": [
-            {"name": "생산성 지수", "description": "생산량 / 투입 자원", "target": "전년 대비 증가"},
-            {"name": "고객 만족도", "description": "고객 만족 점수", "target": "4.5점/5점"},
-            {"name": "직원 만족도", "description": "직원 만족 점수", "target": "4.0점/5점"},
-            {"name": "시장 점유율", "description": "해당 시장 내 점유율", "target": "유지 또는 증가"}
+        "3.3 운영 지표": [
+            {"name": "생산성 지수", "description": "생산량 / 투입 자원", "target": "전년 대비 증가", "formula": "총생산량 / 총투입자원"},
+            {"name": "고객 만족도", "description": "고객 만족 점수", "target": "4.5점/5점", "formula": "고객만족도조사 평균점수"},
+            {"name": "직원 만족도", "description": "직원 만족 점수", "target": "4.0점/5점", "formula": "직원만족도조사 평균점수"},
+            {"name": "시장 점유율", "description": "해당 시장 내 점유율", "target": "유지 또는 증가", "formula": "기업매출 / 전체시장규모 × 100"}
         ]
     }
     
     # KPI 대시보드
-    st.subheader("🎯 핵심 성과 지표")
+    st.markdown('<h3 class="wiki-subheader">3.1 핵심 성과 지표 체계</h3>', unsafe_allow_html=True)
     
     for category, indicators in kpi_categories.items():
-        st.markdown(f"### {category}")
-        cols = st.columns(len(indicators))
+        st.markdown(f'<h4 class="wiki-subheader">{category}</h4>', unsafe_allow_html=True)
         
-        for i, indicator in enumerate(indicators):
-            with cols[i]:
-                st.metric(
-                    label=indicator["name"],
-                    value=indicator["target"],
-                    help=indicator["description"]
-                )
-        st.markdown("---")
+        # 테이블 형태로 표시
+        st.markdown("""
+        <table class="wiki-table">
+            <tr><th>지표명</th><th>설명</th><th>목표치</th><th>산식</th></tr>
+        """, unsafe_allow_html=True)
+        
+        for indicator in indicators:
+            st.markdown(f"""
+            <tr>
+                <td><strong>{indicator["name"]}</strong></td>
+                <td>{indicator["description"]}</td>
+                <td>{indicator["target"]}</td>
+                <td><code>{indicator["formula"]}</code></td>
+            </tr>
+            """, unsafe_allow_html=True)
+        
+        st.markdown("</table>", unsafe_allow_html=True)
     
     # 성과 추이 시뮬레이션
-    st.subheader("📈 성과 추이 시뮬레이션")
+    st.markdown('<h3 class="wiki-subheader">3.2 성과 추이 분석</h3>', unsafe_allow_html=True)
+    
+    st.markdown("""
+    <div class="wiki-text">
+    다음은 대표적인 기업의 경제적 지속가능성 지표들의 추이를 보여주는 시뮬레이션 결과이다. 
+    이러한 데이터를 통해 기업의 지속가능성 수준을 파악할 수 있다.
+    </div>
+    """, unsafe_allow_html=True)
     
     # 샘플 데이터 생성
     dates = pd.date_range(start='2020-01-01', end='2024-12-31', freq='Q')
@@ -211,7 +515,7 @@ elif menu == "성과 지표":
         y=performance_df['매출성장률(%)'],
         mode='lines+markers',
         name='매출성장률(%)',
-        line=dict(color='#FF6B6B')
+        line=dict(color='#0645ad', width=2)
     ))
     
     fig.add_trace(go.Scatter(
@@ -219,7 +523,7 @@ elif menu == "성과 지표":
         y=performance_df['ROE(%)'],
         mode='lines+markers',
         name='ROE(%)',
-        line=dict(color='#4ECDC4')
+        line=dict(color='#cc0000', width=2)
     ))
     
     fig.add_trace(go.Scatter(
@@ -227,384 +531,25 @@ elif menu == "성과 지표":
         y=performance_df['R&D투자율(%)'],
         mode='lines+markers',
         name='R&D투자율(%)',
-        line=dict(color='#45B7D1')
+        line=dict(color='#00aa00', width=2)
     ))
     
     fig.update_layout(
-        title='핵심 성과 지표 추이',
+        title='<b>핵심 성과 지표 추이</b>',
         xaxis_title='날짜',
         yaxis_title='비율(%)',
-        height=500
+        height=500,
+        font=dict(family="Helvetica Neue, Helvetica, Arial, sans-serif", size=12),
+        plot_bgcolor='white',
+        paper_bgcolor='white'
     )
     
     st.plotly_chart(fig, use_container_width=True)
 
-elif menu == "자가진단":
-    st.header("🔍 기업 지속가능성 자가진단")
+elif menu == "4. 자가진단":
+    st.markdown('<h2 class="wiki-header">4. 자가진단</h2>', unsafe_allow_html=True)
     
     st.markdown("""
-    다음 질문들에 답하여 귀하의 기업의 경제적 지속가능성 수준을 진단해보세요.
-    각 항목을 1-5점으로 평가해주세요. (1: 매우 부족, 5: 매우 우수)
-    """)
-    
-    # 진단 카테고리
-    categories = {
-        "재무 건전성": [
-            "안정적인 수익 창출 능력",
-            "건전한 재무 구조",
-            "현금 흐름 관리",
-            "투자 수익률"
-        ],
-        "혁신 역량": [
-            "R&D 투자 수준",
-            "신제품 개발 능력",
-            "기술 혁신 문화",
-            "디지털 전환 수준"
-        ],
-        "운영 효율성": [
-            "생산성 수준",
-            "품질 관리 시스템",
-            "공급망 최적화",
-            "비용 관리 효율성"
-        ],
-        "시장 적응력": [
-            "시장 변화 대응 능력",
-            "고객 만족도",
-            "브랜드 인지도",
-            "경쟁 우위 요소"
-        ],
-        "조직 역량": [
-            "인재 관리 수준",
-            "리더십 품질",
-            "조직 문화",
-            "변화 관리 능력"
-        ]
-    }
-    
-    scores = {}
-    total_score = 0
-    total_items = 0
-    
-    for category, items in categories.items():
-        st.subheader(f"📋 {category}")
-        category_scores = []
-        
-        for item in items:
-            score = st.slider(
-                f"{item}",
-                min_value=1,
-                max_value=5,
-                value=3,
-                key=f"{category}_{item}"
-            )
-            category_scores.append(score)
-            total_score += score
-            total_items += 1
-        
-        scores[category] = sum(category_scores) / len(category_scores)
-        st.write(f"**{category} 평균 점수: {scores[category]:.1f}/5.0**")
-        st.markdown("---")
-    
-    # 전체 진단 결과
-    overall_score = total_score / total_items
-    
-    st.subheader("🎯 종합 진단 결과")
-    
-    col1, col2 = st.columns(2)
-    
-    with col1:
-        st.metric("전체 평균 점수", f"{overall_score:.1f}/5.0")
-        
-        if overall_score >= 4.0:
-            st.success("🌟 우수: 경제적 지속가능성이 뛰어납니다!")
-        elif overall_score >= 3.0:
-            st.warning("⚠️ 보통: 개선이 필요한 영역이 있습니다.")
-        else:
-            st.error("🚨 부족: 전반적인 개선이 필요합니다.")
-    
-    with col2:
-        # 레이더 차트
-        fig = go.Figure()
-        
-        categories_list = list(scores.keys())
-        values = list(scores.values())
-        values += values[:1]  # 닫힌 도형을 위해 첫 값 추가
-        categories_list += categories_list[:1]
-        
-        fig.add_trace(go.Scatterpolar(
-            r=values,
-            theta=categories_list,
-            fill='toself',
-            name='현재 수준'
-        ))
-        
-        fig.update_layout(
-            polar=dict(
-                radialaxis=dict(
-                    visible=True,
-                    range=[0, 5]
-                )),
-            showlegend=True,
-            title="영역별 진단 결과"
-        )
-        
-        st.plotly_chart(fig, use_container_width=True)
-    
-    # 개선 제안
-    st.subheader("💡 개선 제안")
-    
-    weak_areas = [category for category, score in scores.items() if score < 3.0]
-    
-    if weak_areas:
-        st.markdown("**우선 개선 필요 영역:**")
-        for area in weak_areas:
-            st.write(f"• {area}: {scores[area]:.1f}점")
-    else:
-        st.success("모든 영역에서 양호한 수준입니다!")
-
-elif menu == "실행 계획":
-    st.header("📋 지속가능성 실행 계획")
-    
-    st.markdown("""
-    경제적 지속가능성 향상을 위한 단계별 실행 계획을 수립해보세요.
-    """)
-    
-    # 실행 단계
-    phases = {
-        "1단계: 현황 분석 (1-2개월)": {
-            "목표": "현재 상황 파악 및 개선 영역 식별",
-            "활동": [
-                "재무 현황 분석",
-                "시장 포지션 평가",
-                "내부 역량 진단",
-                "경쟁사 벤치마킹",
-                "이해관계자 의견 수렴"
-            ],
-            "결과물": "현황 분석 보고서, 개선 우선순위"
-        },
-        "2단계: 전략 수립 (2-3개월)": {
-            "목표": "지속가능성 전략 및 로드맵 구축",
-            "활동": [
-                "비전 및 목표 설정",
-                "핵심 전략 수립",
-                "실행 계획 작성",
-                "성과 지표 정의",
-                "자원 배분 계획"
-            ],
-            "결과물": "지속가능성 전략서, 실행 로드맵"
-        },
-        "3단계: 실행 준비 (1-2개월)": {
-            "목표": "실행을 위한 기반 구축",
-            "활동": [
-                "조직 체계 구축",
-                "시스템 구축",
-                "교육 및 훈련",
-                "파트너십 구축",
-                "예산 확보"
-            ],
-            "결과물": "실행 체계, 교육 프로그램"
-        },
-        "4단계: 본격 실행 (6-12개월)": {
-            "목표": "전략의 본격적 실행",
-            "활동": [
-                "프로젝트 실행",
-                "성과 모니터링",
-                "정기 점검 및 조정",
-                "이해관계자 소통",
-                "개선 사항 반영"
-            ],
-            "결과물": "실행 성과, 개선 사항"
-        },
-        "5단계: 평가 및 개선 (지속적)": {
-            "목표": "지속적 개선 및 발전",
-            "활동": [
-                "성과 평가",
-                "차기 계획 수립",
-                "베스트 프랙티스 공유",
-                "시스템 고도화",
-                "문화 정착"
-            ],
-            "결과물": "평가 보고서, 차기 계획"
-        }
-    }
-    
-    for phase, details in phases.items():
-        with st.expander(f"📅 {phase}"):
-            st.markdown(f"**목표:** {details['목표']}")
-            st.markdown("**주요 활동:**")
-            for activity in details['활동']:
-                st.write(f"• {activity}")
-            st.markdown(f"**예상 결과물:** {details['결과물']}")
-    
-    st.markdown("---")
-    
-    # 실행 계획 템플릿
-    st.subheader("📝 실행 계획 템플릿")
-    
-    with st.form("action_plan"):
-        st.markdown("### 우선 개선 영역 선택")
-        
-        priority_area = st.selectbox(
-            "개선이 가장 시급한 영역을 선택하세요:",
-            ["재무 건전성", "혁신 역량", "운영 효율성", "시장 적응력", "조직 역량"]
-        )
-        
-        st.markdown("### 목표 설정")
-        target_period = st.selectbox("목표 달성 기간:", ["3개월", "6개월", "1년", "2년"])
-        target_description = st.text_area("구체적인 목표:", placeholder="예: ROE 15% 달성, 신제품 매출 비중 20% 증대 등")
-        
-        st.markdown("### 실행 방안")
-        action_items = st.text_area(
-            "주요 실행 항목 (한 줄씩 입력):",
-            placeholder="예:\n• R&D 투자 확대\n• 디지털 전환 프로젝트 추진\n• 프로세스 혁신 TF 구성"
-        )
-        
-        st.markdown("### 성과 지표")
-        kpi = st.text_input("핵심 성과 지표 (KPI):", placeholder="예: 매출 성장률, ROE, 고객 만족도 등")
-        
-        st.markdown("### 필요 자원")
-        resources = st.text_area("필요한 자원 (예산, 인력, 시스템 등):", placeholder="예: 예산 1억원, 전담 인력 5명, IT 시스템 구축")
-        
-        submitted = st.form_submit_button("실행 계획 생성")
-        
-        if submitted:
-            st.success("✅ 실행 계획이 생성되었습니다!")
-            
-            st.markdown("### 📋 생성된 실행 계획")
-            st.markdown(f"**우선 개선 영역:** {priority_area}")
-            st.markdown(f"**목표 달성 기간:** {target_period}")
-            st.markdown(f"**구체적 목표:** {target_description}")
-            st.markdown(f"**주요 실행 항목:**\n{action_items}")
-            st.markdown(f"**핵심 성과 지표:** {kpi}")
-            st.markdown(f"**필요 자원:** {resources}")
-
-elif menu == "성공 사례":
-    st.header("🏆 성공 사례")
-    
-    st.markdown("""
-    경제적 지속가능성을 성공적으로 달성한 기업들의 사례를 통해 
-    실질적인 인사이트를 얻어보세요.
-    """)
-    
-    # 성공 사례 데이터
-    success_cases = {
-        "기술 혁신 중심": {
-            "company": "A 제조기업",
-            "challenge": "전통적인 제조업에서 디지털 전환 필요성",
-            "strategy": [
-                "스마트 팩토리 구축",
-                "AI 기반 품질 관리 시스템 도입",
-                "IoT를 활용한 예측 정비",
-                "데이터 기반 의사결정 체계 구축"
-            ],
-            "results": [
-                "생산성 30% 향상",
-                "품질 불량률 50% 감소",
-                "운영 비용 20% 절감",
-                "신제품 출시 시간 40% 단축"
-            ],
-            "lessons": "지속적인 기술 투자와 조직 문화 변화가 핵심"
-        },
-        "시장 다각화": {
-            "company": "B 유통기업",
-            "challenge": "온라인 시장 확산으로 인한 오프라인 매출 감소",
-            "strategy": [
-                "옴니채널 플랫폼 구축",
-                "개인화된 고객 서비스 제공",
-                "새로운 비즈니스 모델 개발",
-                "글로벌 시장 진출"
-            ],
-            "results": [
-                "온라인 매출 300% 증가",
-                "고객 만족도 25% 향상",
-                "시장 점유율 15% 확대",
-                "수익성 40% 개선"
-            ],
-            "lessons": "고객 중심 사고와 빠른 시장 적응이 성공 요인"
-        },
-        "운영 효율성": {
-            "company": "C 서비스기업",
-            "challenge": "인건비 상승과 경쟁 심화로 인한 수익성 악화",
-            "strategy": [
-                "프로세스 자동화 추진",
-                "린 경영 시스템 도입",
-                "직원 생산성 향상 프로그램",
-                "파트너십 기반 협업 모델"
-            ],
-            "results": [
-                "운영 비용 25% 감소",
-                "서비스 품질 향상",
-                "직원 만족도 20% 증가",
-                "고객 유지율 35% 향상"
-            ],
-            "lessons": "효율성과 품질을 동시에 추구하는 균형 잡힌 접근"
-        }
-    }
-    
-    for case_type, case_data in success_cases.items():
-        with st.expander(f"📊 {case_type}: {case_data['company']}"):
-            col1, col2 = st.columns(2)
-            
-            with col1:
-                st.markdown("### 🎯 도전 과제")
-                st.write(case_data['challenge'])
-                
-                st.markdown("### 🚀 추진 전략")
-                for strategy in case_data['strategy']:
-                    st.write(f"• {strategy}")
-            
-            with col2:
-                st.markdown("### 📈 주요 성과")
-                for result in case_data['results']:
-                    st.write(f"• {result}")
-                
-                st.markdown("### 💡 핵심 교훈")
-                st.info(case_data['lessons'])
-    
-    st.markdown("---")
-    
-    # 성공 요인 분석
-    st.subheader("🔍 성공 요인 분석")
-    
-    success_factors = {
-        "리더십": ["강력한 의지", "변화 추진력", "장기적 관점"],
-        "조직문화": ["혁신 마인드", "학습 조직", "협업 문화"],
-        "전략 실행": ["명확한 목표", "체계적 접근", "지속적 모니터링"],
-        "자원 활용": ["적절한 투자", "핵심 역량 집중", "파트너십 활용"],
-        "시장 적응": ["고객 중심", "민첩한 대응", "지속적 혁신"]
-    }
-    
-    cols = st.columns(len(success_factors))
-    
-    for i, (factor, elements) in enumerate(success_factors.items()):
-        with cols[i]:
-            st.markdown(f"### {factor}")
-            for element in elements:
-                st.write(f"• {element}")
-    
-    # 벤치마킹 체크리스트
-    st.subheader("📋 벤치마킹 체크리스트")
-    
-    checklist = [
-        "명확한 지속가능성 비전과 목표 설정",
-        "최고 경영진의 강력한 의지와 지원",
-        "체계적인 현황 분석과 개선 계획",
-        "핵심 성과 지표(KPI) 설정 및 모니터링",
-        "조직 문화 혁신과 변화 관리",
-        "지속적인 혁신과 기술 투자",
-        "이해관계자와의 효과적 소통",
-        "단계적 실행과 지속적 개선"
-    ]
-    
-    st.markdown("**우리 기업에 적용 가능한 요소들을 체크해보세요:**")
-    
-    for item in checklist:
-        st.checkbox(item, key=f"check_{item}")
-
-# 푸터
-st.markdown("---")
-st.markdown("""
-<div style='text-align: center; color: #666; font-size: 12px;'>
-📈 기업의 경제적 지속발전 가능성 웹앱 | 지속가능한 경영을 위한 가이드
-</div>
-""", unsafe_allow_html=True)
+    <div class="wiki-text">
+    기업의 경제적 지속발전 가능성을 객관적으로 평가하기 위한 자가진단 도구이다. 
+    이 진단은 5개 핵심 영역에 대한 20개 항목으로 구성되며
