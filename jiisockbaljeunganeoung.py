@@ -1,555 +1,803 @@
 import streamlit as st
-import pandas as pd
-import plotly.express as px
-import plotly.graph_objects as go
-from datetime import datetime, timedelta
-import numpy as np
+import datetime
 
 # 페이지 설정
 st.set_page_config(
-    page_title="기업의 경제적 지속발전 가능성 - 위키",
-    page_icon="📚",
-    layout="wide"
+    page_title="기업 지속 발전 가이드",
+    page_icon="🏢",
+    layout="wide",
+    initial_sidebar_state="expanded"
 )
 
-# 위키피디아 스타일 CSS
-st.markdown("""
-<style>
-    .main-title {
-        font-family: "Linux Libertine", Georgia, Times, serif;
-        font-size: 2.5rem;
-        font-weight: normal;
-        border-bottom: 3px solid #a2a9b1;
-        padding-bottom: 10px;
-        margin-bottom: 20px;
-        color: #000;
-    }
-    
-    .wiki-header {
-        font-family: "Linux Libertine", Georgia, Times, serif;
-        font-size: 1.8rem;
-        font-weight: normal;
-        border-bottom: 1px solid #a2a9b1;
-        padding-bottom: 5px;
-        margin-top: 30px;
-        margin-bottom: 15px;
-        color: #000;
-    }
-    
-    .wiki-subheader {
-        font-family: "Linux Libertine", Georgia, Times, serif;
-        font-size: 1.4rem;
-        font-weight: normal;
-        margin-top: 25px;
-        margin-bottom: 10px;
-        color: #000;
-    }
-    
-    .wiki-text {
-        font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
-        font-size: 14px;
-        line-height: 1.6;
-        color: #202122;
-        text-align: justify;
-    }
-    
-    .wiki-toc {
-        background-color: #f8f9fa;
-        border: 1px solid #a2a9b1;
-        padding: 15px;
-        margin: 20px 0;
-        border-radius: 3px;
-    }
-    
-    .wiki-toc-title {
-        font-family: "Linux Libertine", Georgia, Times, serif;
-        font-size: 1.2rem;
-        font-weight: bold;
-        margin-bottom: 10px;
-        color: #000;
-    }
-    
-    .wiki-infobox {
-        background-color: #f8f9fa;
-        border: 1px solid #a2a9b1;
-        padding: 15px;
-        margin: 20px 0;
-        border-radius: 3px;
-        width: 100%;
-    }
-    
-    .wiki-infobox-title {
-        font-family: "Linux Libertine", Georgia, Times, serif;
-        font-size: 1.1rem;
-        font-weight: bold;
-        text-align: center;
-        background-color: #ccccff;
-        padding: 8px;
-        margin: -15px -15px 15px -15px;
-        border-radius: 3px 3px 0 0;
-    }
-    
-    .wiki-reference {
-        font-size: 11px;
-        color: #0645ad;
-        text-decoration: none;
-    }
-    
-    .wiki-note {
-        background-color: #f6f6f6;
-        border-left: 4px solid #36c;
-        padding: 10px 15px;
-        margin: 15px 0;
-        font-style: italic;
-        border-radius: 0 3px 3px 0;
-    }
-    
-    .wiki-table {
-        border-collapse: collapse;
-        width: 100%;
-        background-color: #f8f9fa;
-        border: 1px solid #a2a9b1;
-        margin: 10px 0;
-    }
-    
-    .wiki-table th {
-        background-color: #ccccff;
-        padding: 8px;
-        border: 1px solid #a2a9b1;
-        font-weight: bold;
-    }
-    
-    .wiki-table td {
-        padding: 8px;
-        border: 1px solid #a2a9b1;
-    }
-    
-    .sidebar .sidebar-content {
-        background-color: #f8f9fa;
-        border: 1px solid #a2a9b1;
-        padding: 15px;
-        border-radius: 3px;
-    }
-    
-    .wiki-category {
-        background-color: #f8f9fa;
-        border: 1px solid #a2a9b1;
-        padding: 10px;
-        margin: 20px 0;
-        border-radius: 3px;
-        font-size: 12px;
-    }
-    
-    .wiki-disambiguation {
-        background-color: #f8f9fa;
-        border: 1px solid #a2a9b1;
-        padding: 10px;
-        margin: 10px 0;
-        border-radius: 3px;
-        font-style: italic;
-    }
-</style>
-""", unsafe_allow_html=True)
+# 사이드바 목차
+st.sidebar.title("📚 목차")
+sections = {
+    "개요": "overview",
+    "핵심 원칙": "principles",
+    "전략적 접근": "strategies",
+    "실행 방법": "implementation",
+    "평가 지표": "metrics",
+    "사례 연구": "case_studies",
+    "참고 자료": "references"
+}
 
-# 메인 제목
-st.markdown('<h1 class="main-title">기업의 경제적 지속발전 가능성</h1>', unsafe_allow_html=True)
+selected_section = st.sidebar.radio("섹션 선택", list(sections.keys()))
 
-# 위키 스타일 disambiguation
-st.markdown("""
-<div class="wiki-disambiguation">
-이 문서는 <strong>기업의 경제적 지속발전 가능성</strong>에 관한 것입니다. 
-다른 의미의 지속가능성에 대해서는 <a href="#" class="wiki-reference">지속가능성 (동음이의)</a>를 참조하십시오.
-</div>
-""", unsafe_allow_html=True)
+# 메인 헤더
+st.title("🏢 기업 지속 발전 가이드")
+st.markdown("*지속 가능한 기업 경영을 위한 종합 가이드*")
 
-# 사이드바 - 위키 스타일 네비게이션
-st.sidebar.markdown("""
-<div style="background-color: #f8f9fa; border: 1px solid #a2a9b1; padding: 15px; border-radius: 3px;">
-<h3 style="margin-top: 0; color: #000; font-family: 'Linux Libertine', Georgia, Times, serif;">목차</h3>
-</div>
-""", unsafe_allow_html=True)
+# 정보 박스
+st.info("이 문서는 기업이 장기적으로 지속 가능한 발전을 이루기 위한 핵심 전략과 실행 방안을 제시합니다.")
 
-menu = st.sidebar.radio(
-    "",
-    ["1. 개요", "2. 핵심 전략", "3. 성과 지표", "4. 자가진단", "5. 실행 계획", "6. 성공 사례"],
-    label_visibility="collapsed"
-)
+# 마지막 업데이트 정보
+current_date = datetime.datetime.now().strftime("%Y년 %m월 %d일")
+st.caption(f"마지막 업데이트: {current_date}")
 
-# 목차 (Table of Contents)
-if menu == "1. 개요":
-    st.markdown("""
-    <div class="wiki-toc">
-        <div class="wiki-toc-title">목차</div>
-        <div class="wiki-text">
-        <strong>1.</strong> 개요<br>
-        <strong>1.1</strong> 정의<br>
-        <strong>1.2</strong> 핵심 원칙<br>
-        <strong>1.3</strong> 구성 요소<br>
-        <strong>1.4</strong> 중요성<br>
-        <strong>2.</strong> 핵심 전략<br>
-        <strong>3.</strong> 성과 지표<br>
-        <strong>4.</strong> 자가진단<br>
-        <strong>5.</strong> 실행 계획<br>
-        <strong>6.</strong> 성공 사례
-        </div>
-    </div>
-    """, unsafe_allow_html=True)
+st.divider()
 
-# 메인 콘텐츠
-if menu == "1. 개요":
-    # 인포박스
-    st.markdown("""
-    <div class="wiki-infobox">
-        <div class="wiki-infobox-title">기업의 경제적 지속발전 가능성</div>
-        <table class="wiki-table">
-            <tr><th>분야</th><td>경영학, 경제학</td></tr>
-            <tr><th>관련 개념</th><td>지속가능경영, ESG, 기업가치</td></tr>
-            <tr><th>주요 지표</th><td>ROE, 매출성장률, 혁신지수</td></tr>
-            <tr><th>관련 이론</th><td>이해관계자 이론, 자원기반이론</td></tr>
-        </table>
-    </div>
-    """, unsafe_allow_html=True)
-    
-    st.markdown('<h2 class="wiki-header">1. 개요</h2>', unsafe_allow_html=True)
-    
-    st.markdown("""
-    <div class="wiki-text">
-    <strong>기업의 경제적 지속발전 가능성</strong>(Corporate Economic Sustainability)은 기업이 
-    장기적으로 수익성을 유지하면서도 혁신과 효율성을 통해 지속적인 경쟁력을 확보하는 능력을 
-    의미한다. 이는 단순한 단기적 이익 추구가 아닌, 장기적 가치 창출에 중점을 두는 경영 철학이다.
-    </div>
-    """, unsafe_allow_html=True)
-    
-    st.markdown('<h3 class="wiki-subheader">1.1 정의</h3>', unsafe_allow_html=True)
-    
-    st.markdown("""
-    <div class="wiki-text">
-    경제적 지속가능성은 기업이 현재의 경제적 성과를 달성하면서도 미래 세대의 필요를 충족할 수 있는 
-    능력을 손상시키지 않는 방식으로 사업을 운영하는 것을 의미한다. 이는 다음과 같은 특징을 갖는다:
-    </div>
-    """, unsafe_allow_html=True)
+# 개요 섹션
+if selected_section == "개요":
+    st.header("1. 개요")
     
     col1, col2 = st.columns([2, 1])
     
     with col1:
         st.markdown("""
-        <div class="wiki-text">
-        <ul>
-        <li><strong>장기적 관점</strong>: 단기적 이익보다 장기적 가치 창출 우선</li>
-        <li><strong>혁신 중심</strong>: 지속적인 혁신을 통한 경쟁력 확보</li>
-        <li><strong>효율성 추구</strong>: 자원의 최적 활용과 운영 효율성 극대화</li>
-        <li><strong>이해관계자 고려</strong>: 모든 이해관계자의 가치 균형 추구</li>
-        </ul>
-        </div>
-        """, unsafe_allow_html=True)
+        **기업 지속 발전**(Corporate Sustainability)은 기업이 경제적 성과를 달성하면서도 환경적 책임과 사회적 가치를 동시에 추구하는 경영 철학입니다.
+        
+        ### 정의
+        기업 지속 발전은 다음 세 가지 핵심 요소로 구성됩니다:
+        - **경제적 지속가능성**: 장기적 수익성과 재정 안정성
+        - **환경적 지속가능성**: 환경 보호와 자원의 효율적 활용
+        - **사회적 지속가능성**: 사회적 책임과 이해관계자 가치 창출
+        
+        ### 중요성
+        현대 기업 환경에서 지속 발전은 선택이 아닌 필수입니다. 소비자, 투자자, 정부 모두 기업의 지속가능성을 중요하게 평가하고 있습니다.
+        """)
     
     with col2:
-        # 지속가능성 요소 파이 차트
-        labels = ['경제적 성과', '혁신 역량', '운영 효율성', '리스크 관리', '이해관계자 관계']
-        values = [25, 20, 20, 15, 20]
-        colors = ['#e8f4f8', '#d4edda', '#fff3cd', '#f8d7da', '#e2e3e5']
+        st.markdown("""
+        ### 📊 주요 통계
+        - 전 세계 CEO의 **83%**가 지속가능성을 핵심 전략으로 인식
+        - 지속가능한 기업의 평균 **ROI 15% 증가**
+        - 밀레니얼 세대의 **73%**가 지속가능한 제품에 더 많은 비용 지불 의향
         
-        fig = px.pie(values=values, names=labels, 
-                     title="<b>구성 요소</b>",
-                     color_discrete_sequence=colors)
-        fig.update_layout(
-            font=dict(family="Helvetica Neue, Helvetica, Arial, sans-serif", size=12),
-            title_font_size=14,
-            width=400,
-            height=300
-        )
-        st.plotly_chart(fig, use_container_width=True)
+        ### 🎯 핵심 목표
+        1. 장기적 성장
+        2. 리스크 관리
+        3. 브랜드 가치 제고
+        4. 이해관계자 신뢰 구축
+        """)
+
+# 핵심 원칙 섹션
+elif selected_section == "핵심 원칙":
+    st.header("2. 핵심 원칙")
     
-    st.markdown('<h3 class="wiki-subheader">1.2 핵심 원칙</h3>', unsafe_allow_html=True)
+    st.markdown("### 2.1 Triple Bottom Line (3P)")
     
-    st.markdown("""
-    <div class="wiki-text">
-    기업의 경제적 지속발전 가능성은 다음과 같은 핵심 원칙들에 기반한다:
-    </div>
-    """, unsafe_allow_html=True)
-    
-    principles_data = {
-        "원칙": ["장기적 가치 창출", "지속가능한 비즈니스 모델", "혁신과 적응력", "이해관계자 가치 균형"],
-        "설명": [
-            "단기적 이익보다 장기적 가치 창출을 우선시하는 경영 철학",
-            "환경 변화에 적응할 수 있는 유연하고 견고한 비즈니스 모델 구축",
-            "지속적인 혁신을 통해 변화하는 시장 환경에 적응하는 능력",
-            "주주뿐만 아니라 모든 이해관계자의 가치를 고려하는 균형 잡힌 접근"
-        ]
-    }
-    
-    principles_df = pd.DataFrame(principles_data)
-    st.markdown("""
-    <div class="wiki-text">
-    <table class="wiki-table">
-        <tr><th>원칙</th><th>설명</th></tr>
-        <tr><td>장기적 가치 창출</td><td>단기적 이익보다 장기적 가치 창출을 우선시하는 경영 철학</td></tr>
-        <tr><td>지속가능한 비즈니스 모델</td><td>환경 변화에 적응할 수 있는 유연하고 견고한 비즈니스 모델 구축</td></tr>
-        <tr><td>혁신과 적응력</td><td>지속적인 혁신을 통해 변화하는 시장 환경에 적응하는 능력</td></tr>
-        <tr><td>이해관계자 가치 균형</td><td>주주뿐만 아니라 모든 이해관계자의 가치를 고려하는 균형 잡힌 접근</td></tr>
-    </table>
-    </div>
-    """, unsafe_allow_html=True)
-    
-    st.markdown('<h3 class="wiki-subheader">1.3 중요성</h3>', unsafe_allow_html=True)
-    
-    st.markdown("""
-    <div class="wiki-note">
-    <strong>주의:</strong> 경제적 지속가능성의 부족은 기업의 장기적 생존을 위협할 수 있다.
-    </div>
-    """, unsafe_allow_html=True)
-    
-    importance_data = {
-        "지속가능성 확보 시": [
-            "장기적 수익성 확보",
-            "경쟁 우위 유지",
-            "투자자 신뢰 증대",
-            "시장 변화 대응력 향상",
-            "브랜드 가치 상승"
-        ],
-        "지속가능성 부족 시": [
-            "단기적 수익 추구로 인한 장기 손실",
-            "혁신 부족으로 인한 경쟁력 상실",
-            "지속불가능한 비즈니스 모델",
-            "이해관계자 불신",
-            "시장 변화 적응 실패"
-        ]
-    }
-    
-    col1, col2 = st.columns(2)
+    col1, col2, col3 = st.columns(3)
     
     with col1:
         st.markdown("""
-        <div class="wiki-text">
-        <h4>✓ 확보 시 장점</h4>
-        <ul>
-        <li>장기적 수익성 확보</li>
-        <li>경쟁 우위 유지</li>
-        <li>투자자 신뢰 증대</li>
-        <li>시장 변화 대응력 향상</li>
-        <li>브랜드 가치 상승</li>
-        </ul>
-        </div>
-        """, unsafe_allow_html=True)
+        #### 💰 Profit (수익)
+        - 장기적 수익성 확보
+        - 효율적 자원 활용
+        - 혁신을 통한 경쟁력 강화
+        - 지속가능한 비즈니스 모델 개발
+        """)
     
     with col2:
         st.markdown("""
-        <div class="wiki-text">
-        <h4>✗ 부족 시 위험</h4>
-        <ul>
-        <li>단기적 수익 추구로 인한 장기 손실</li>
-        <li>혁신 부족으로 인한 경쟁력 상실</li>
-        <li>지속불가능한 비즈니스 모델</li>
-        <li>이해관계자 불신</li>
-        <li>시장 변화 적응 실패</li>
-        </ul>
-        </div>
-        """, unsafe_allow_html=True)
+        #### 👥 People (사람)
+        - 직원 복지와 안전
+        - 지역사회 기여
+        - 고객 만족과 신뢰
+        - 인권 존중과 다양성
+        """)
+    
+    with col3:
+        st.markdown("""
+        #### 🌍 Planet (지구)
+        - 환경 보호와 보존
+        - 탄소 배출 감소
+        - 순환 경제 구현
+        - 재생 가능 에너지 활용
+        """)
+    
+    st.divider()
+    
+    st.markdown("### 2.2 ESG 경영")
+    
+    tab1, tab2, tab3 = st.tabs(["환경 (E)", "사회 (S)", "지배구조 (G)"])
+    
+    with tab1:
+        st.markdown("""
+        #### 🌱 환경 (Environmental)
+        - **기후 변화 대응**: 탄소 중립 목표 설정 및 달성
+        - **자원 효율성**: 물, 에너지, 원자재의 효율적 사용
+        - **폐기물 관리**: 재활용과 폐기물 최소화
+        - **생물 다양성**: 생태계 보호와 복원 활동
+        """)
+    
+    with tab2:
+        st.markdown("""
+        #### 🤝 사회 (Social)
+        - **인적 자본**: 교육, 훈련, 다양성 프로그램
+        - **지역사회**: 사회공헌과 지역 발전 기여
+        - **고객 관계**: 제품 안전과 고객 만족
+        - **공급망 관리**: 윤리적 조달과 공정한 거래
+        """)
+    
+    with tab3:
+        st.markdown("""
+        #### ⚖️ 지배구조 (Governance)
+        - **이사회 독립성**: 투명하고 독립적인 이사회 구성
+        - **윤리 경영**: 부패 방지와 윤리적 의사결정
+        - **리스크 관리**: 체계적인 위험 관리 시스템
+        - **이해관계자 참여**: 투명한 소통과 참여 채널
+        """)
 
-elif menu == "2. 핵심 전략":
-    st.markdown('<h2 class="wiki-header">2. 핵심 전략</h2>', unsafe_allow_html=True)
+# 전략적 접근 섹션
+elif selected_section == "전략적 접근":
+    st.header("3. 전략적 접근")
     
-    st.markdown("""
-    <div class="wiki-text">
-    기업의 경제적 지속발전 가능성을 확보하기 위한 핵심 전략은 크게 네 가지 영역으로 구분할 수 있다. 
-    각 전략은 상호 연관성을 가지며, 통합적으로 접근할 때 최대의 효과를 발휘한다.
-    </div>
-    """, unsafe_allow_html=True)
+    st.markdown("### 3.1 지속가능성 통합 전략")
     
-    strategies = {
-        "2.1 혁신과 기술 개발": {
-            "description": "지속적인 연구개발과 기술 혁신을 통한 경쟁력 확보",
-            "methods": [
-                "R&D 투자 확대",
-                "디지털 전환 추진",
-                "신기술 도입 및 활용",
-                "혁신 문화 조성",
-                "오픈 이노베이션 추진"
-            ],
-            "details": "혁신과 기술 개발은 기업의 장기적 경쟁력 확보를 위한 핵심 전략이다. 이는 단순한 기술 도입이 아닌, 조직 전체의 혁신 역량을 강화하는 포괄적 접근을 의미한다."
-        },
-        "2.2 운영 효율성 향상": {
-            "description": "프로세스 최적화와 자원 활용 효율성 제고",
-            "methods": [
-                "프로세스 자동화",
-                "린 경영 도입",
-                "공급망 최적화",
-                "에너지 효율성 개선",
-                "비용 구조 개선"
-            ],
-            "details": "운영 효율성 향상은 기업의 비용 경쟁력 확보와 수익성 개선을 위한 필수 요소이다. 이는 기술적 개선뿐만 아니라 조직 운영 방식의 전반적인 혁신을 포함한다."
-        },
-        "2.3 시장 다각화": {
-            "description": "새로운 시장 진출과 제품 포트폴리오 다양화",
-            "methods": [
-                "신시장 개척",
-                "제품 다양화",
-                "서비스 확장",
-                "글로벌 진출",
-                "파트너십 구축"
-            ],
-            "details": "시장 다각화는 기업의 리스크를 분산하고 새로운 성장 동력을 확보하는 전략이다. 이는 기존 사업 영역의 확장과 새로운 영역으로의 진출을 모두 포함한다."
-        },
-        "2.4 인재 개발": {
-            "description": "핵심 인재 확보와 역량 강화를 통한 조직 경쟁력 제고",
-            "methods": [
-                "교육 훈련 강화",
-                "리더십 개발",
-                "성과 관리 시스템",
-                "조직 문화 개선",
-                "인재 유치 및 유지"
-            ],
-            "details": "인재 개발은 기업의 모든 전략 실행의 기반이 되는 핵심 요소이다. 우수한 인재 없이는 어떤 전략도 성공할 수 없다는 점에서 그 중요성이 더욱 크다."
-        }
-    }
+    strategy_tabs = st.tabs(["비전 수립", "목표 설정", "실행 계획", "모니터링"])
     
-    for strategy, details in strategies.items():
-        st.markdown(f'<h3 class="wiki-subheader">{strategy}</h3>', unsafe_allow_html=True)
+    with strategy_tabs[0]:
+        st.markdown("""
+        #### 🎯 비전 수립
         
-        st.markdown(f"""
-        <div class="wiki-text">
-        <p><strong>개념:</strong> {details['description']}</p>
-        <p>{details['details']}</p>
-        </div>
-        """, unsafe_allow_html=True)
+        **단계별 접근법:**
+        1. **현황 분석**: 기업의 현재 지속가능성 수준 평가
+        2. **이해관계자 분석**: 주요 이해관계자의 기대와 요구사항 파악
+        3. **중대성 평가**: 기업과 이해관계자에게 중요한 이슈 식별
+        4. **비전 설정**: 명확하고 달성 가능한 지속가능성 비전 수립
+        
+        **예시 비전:**
+        - "2030년까지 탄소 중립 달성"
+        - "지속가능한 혁신으로 더 나은 미래 창조"
+        - "사회와 환경에 긍정적 영향을 미치는 기업"
+        """)
+    
+    with strategy_tabs[1]:
+        st.markdown("""
+        #### 📊 목표 설정 (SMART 원칙)
+        
+        **Specific (구체적)**: 명확하고 구체적인 목표
+        **Measurable (측정가능)**: 정량적 지표로 측정 가능
+        **Achievable (달성가능)**: 현실적이고 달성 가능한 수준
+        **Relevant (관련성)**: 기업 전략과 연관성
+        **Time-bound (시간제한)**: 명확한 달성 기한 설정
+        
+        **목표 예시:**
+        - 2025년까지 재생에너지 비율 50% 달성
+        - 2030년까지 폐기물 매립 제로 달성
+        - 여성 임원 비율 30% 달성
+        """)
+    
+    with strategy_tabs[2]:
+        st.markdown("""
+        #### 🚀 실행 계획
+        
+        **1. 조직 구조 개편**
+        - 지속가능성 전담 부서 설치
+        - 임원급 CSO(Chief Sustainability Officer) 임명
+        - 부서별 지속가능성 담당자 지정
+        
+        **2. 정책 및 절차 수립**
+        - 지속가능성 정책 문서화
+        - 업무 프로세스에 지속가능성 고려사항 반영
+        - 공급업체 행동 강령 수립
+        
+        **3. 교육 및 인식 제고**
+        - 전 직원 지속가능성 교육 실시
+        - 지속가능성 문화 확산 프로그램
+        - 인센티브 시스템 도입
+        """)
+    
+    with strategy_tabs[3]:
+        st.markdown("""
+        #### 📈 모니터링 및 평가
+        
+        **정기적 평가 체계:**
+        - 월별 KPI 모니터링
+        - 분기별 성과 리뷰
+        - 연간 지속가능성 보고서 발간
+        
+        **개선 활동:**
+        - 갭 분석 및 개선 방안 도출
+        - 모범 사례 공유 및 확산
+        - 외부 전문가 자문 활용
+        
+        **투명성 확보:**
+        - 이해관계자 대상 정기 보고
+        - 웹사이트 공개 및 소통
+        - 제3자 검증 실시
+        """)
+
+# 실행 방법 섹션
+elif selected_section == "실행 방법":
+    st.header("4. 실행 방법")
+    
+    implementation_option = st.selectbox(
+        "실행 영역 선택",
+        ["환경 관리", "사회적 책임", "지배구조 개선", "혁신 관리"]
+    )
+    
+    if implementation_option == "환경 관리":
+        st.markdown("### 🌍 환경 관리 실행 방법")
+        
+        env_col1, env_col2 = st.columns(2)
+        
+        with env_col1:
+            st.markdown("""
+            #### 탄소 배출 관리
+            **단계별 접근:**
+            1. **현황 파악**: 탄소 배출량 측정 및 분석
+            2. **목표 설정**: 감축 목표 및 일정 수립
+            3. **실행 계획**: 구체적 감축 방안 실행
+            4. **모니터링**: 지속적 추적 및 개선
+            
+            **구체적 방법:**
+            - 에너지 효율 개선 프로젝트
+            - 재생에너지 도입
+            - 친환경 교통 수단 활용
+            - 원격 근무 확대
+            """)
+        
+        with env_col2:
+            st.markdown("""
+            #### 자원 효율성 향상
+            **물 관리:**
+            - 물 사용량 모니터링
+            - 재활용 시스템 구축
+            - 누수 방지 시스템 도입
+            
+            **폐기물 관리:**
+            - 3R 원칙 (Reduce, Reuse, Recycle)
+            - 순환 경제 모델 도입
+            - 폐기물 분리수거 체계화
+            
+            **에너지 관리:**
+            - 스마트 에너지 관리 시스템
+            - LED 조명 교체
+            - 건물 에너지 효율 개선
+            """)
+    
+    elif implementation_option == "사회적 책임":
+        st.markdown("### 🤝 사회적 책임 실행 방법")
+        
+        social_tabs = st.tabs(["직원 관리", "지역사회", "고객 관계"])
+        
+        with social_tabs[0]:
+            st.markdown("""
+            #### 👥 직원 관리
+            
+            **다양성 및 포용성:**
+            - 다양한 배경의 인재 채용
+            - 성별, 연령, 장애 등 차별 금지
+            - 포용적 기업 문화 조성
+            - 다양성 교육 프로그램 운영
+            
+            **복지 및 안전:**
+            - 안전한 근무 환경 조성
+            - 직원 건강 프로그램 운영
+            - 일-생활 균형 지원
+            - 스트레스 관리 프로그램
+            
+            **교육 및 개발:**
+            - 체계적인 교육 훈련 프로그램
+            - 경력 개발 경로 제공
+            - 멘토링 시스템 운영
+            - 평생 학습 문화 조성
+            """)
+        
+        with social_tabs[1]:
+            st.markdown("""
+            #### 🏘️ 지역사회 기여
+            
+            **사회공헌 활동:**
+            - 교육 지원 프로그램
+            - 환경 보호 활동 참여
+            - 취약계층 지원 사업
+            - 문화 예술 후원 활동
+            
+            **지역 경제 활성화:**
+            - 지역 업체 우선 구매
+            - 지역 인재 채용 확대
+            - 지역 기술 혁신 지원
+            - 창업 지원 프로그램 운영
+            
+            **파트너십 구축:**
+            - NGO와의 협력 사업
+            - 정부 기관과의 협력
+            - 학계와의 연구 협력
+            - 국제 기구와의 협력
+            """)
+        
+        with social_tabs[2]:
+            st.markdown("""
+            #### 🛍️ 고객 관계 관리
+            
+            **제품 안전성:**
+            - 엄격한 품질 관리 시스템
+            - 정기적인 안전성 테스트
+            - 신속한 리콜 시스템
+            - 고객 피드백 반영 체계
+            
+            **고객 만족:**
+            - 고객 서비스 품질 향상
+            - 고객 불만 처리 시스템
+            - 고객 참여 프로그램
+            - 맞춤형 서비스 제공
+            
+            **투명한 소통:**
+            - 제품 정보 공개
+            - 가격 정책 투명성
+            - 고객 의견 수렴 채널
+            - 정기적인 고객 설문조사
+            """)
+
+# 평가 지표 섹션
+elif selected_section == "평가 지표":
+    st.header("5. 평가 지표")
+    
+    st.markdown("### 5.1 핵심 성과 지표 (KPI)")
+    
+    kpi_category = st.selectbox(
+        "지표 카테고리 선택",
+        ["환경 지표", "사회 지표", "경제 지표", "지배구조 지표"]
+    )
+    
+    if kpi_category == "환경 지표":
+        st.markdown("#### 🌱 환경 성과 지표")
+        
+        env_metrics = {
+            "탄소 배출량": {"단위": "tCO2e", "목표": "연간 5% 감소", "현황": "측정 중"},
+            "에너지 효율": {"단위": "kWh/제품", "목표": "연간 3% 개선", "현황": "개선 중"},
+            "물 사용량": {"단위": "㎥/제품", "목표": "연간 10% 감소", "현황": "추적 중"},
+            "폐기물 재활용률": {"단위": "%", "목표": "85% 달성", "현황": "80%"},
+            "재생에너지 비율": {"단위": "%", "목표": "50% 달성", "현황": "35%"}
+        }
+        
+        for metric, data in env_metrics.items():
+            col1, col2, col3, col4 = st.columns(4)
+            with col1:
+                st.metric(metric, data["현황"])
+            with col2:
+                st.write(f"**단위**: {data['단위']}")
+            with col3:
+                st.write(f"**목표**: {data['목표']}")
+            with col4:
+                progress = 70 if "%" in data["현황"] else 60
+                st.progress(progress)
+    
+    elif kpi_category == "사회 지표":
+        st.markdown("#### 👥 사회 성과 지표")
+        
+        social_metrics = {
+            "직원 만족도": {"단위": "점/5점", "목표": "4.5점 이상", "현황": "4.2점"},
+            "안전사고 발생률": {"단위": "건/년", "목표": "0건", "현황": "2건"},
+            "여성 관리자 비율": {"단위": "%", "목표": "30%", "현황": "25%"},
+            "교육 시간": {"단위": "시간/인", "목표": "40시간", "현황": "35시간"},
+            "지역사회 투자": {"단위": "억원", "목표": "10억원", "현황": "8억원"}
+        }
+        
+        for metric, data in social_metrics.items():
+            col1, col2, col3, col4 = st.columns(4)
+            with col1:
+                st.metric(metric, data["현황"])
+            with col2:
+                st.write(f"**단위**: {data['단위']}")
+            with col3:
+                st.write(f"**목표**: {data['목표']}")
+            with col4:
+                progress = 75 if "%" in data["현황"] else 65
+                st.progress(progress)
+    
+    elif kpi_category == "경제 지표":
+        st.markdown("#### 💰 경제 성과 지표")
+        
+        economic_metrics = {
+            "지속가능성 투자 ROI": {"단위": "%", "목표": "15%", "현황": "12%"},
+            "친환경 제품 매출 비중": {"단위": "%", "목표": "40%", "현황": "30%"},
+            "비용 절감 효과": {"단위": "억원", "목표": "50억원", "현황": "35억원"},
+            "혁신 투자 비율": {"단위": "%", "목표": "5%", "현황": "4%"},
+            "공급망 효율성": {"단위": "점/100점", "목표": "85점", "현황": "78점"}
+        }
+        
+        for metric, data in economic_metrics.items():
+            col1, col2, col3, col4 = st.columns(4)
+            with col1:
+                st.metric(metric, data["현황"])
+            with col2:
+                st.write(f"**단위**: {data['단위']}")
+            with col3:
+                st.write(f"**목표**: {data['목표']}")
+            with col4:
+                progress = 80 if "%" in data["현황"] else 70
+                st.progress(progress)
+    
+    elif kpi_category == "지배구조 지표":
+        st.markdown("#### ⚖️ 지배구조 성과 지표")
+        
+        governance_metrics = {
+            "이사회 독립성": {"단위": "%", "목표": "50%", "현황": "45%"},
+            "윤리 교육 이수율": {"단위": "%", "목표": "100%", "현황": "95%"},
+            "내부 감사 횟수": {"단위": "회/년", "목표": "12회", "현황": "10회"},
+            "컴플라이언스 위반": {"단위": "건", "목표": "0건", "현황": "1건"},
+            "투명성 지수": {"단위": "점/100점", "목표": "90점", "현황": "85점"}
+        }
+        
+        for metric, data in governance_metrics.items():
+            col1, col2, col3, col4 = st.columns(4)
+            with col1:
+                st.metric(metric, data["현황"])
+            with col2:
+                st.write(f"**단위**: {data['단위']}")
+            with col3:
+                st.write(f"**목표**: {data['목표']}")
+            with col4:
+                progress = 85 if "%" in data["현황"] else 75
+                st.progress(progress)
+
+# 사례 연구 섹션
+elif selected_section == "사례 연구":
+    st.header("6. 사례 연구")
+    
+    case_study = st.selectbox(
+        "사례 선택",
+        ["글로벌 기업 A", "국내 기업 B", "중소기업 C", "스타트업 D"]
+    )
+    
+    if case_study == "글로벌 기업 A":
+        st.markdown("### 🌍 글로벌 기업 A: 탄소 중립 달성 사례")
+        
+        case_col1, case_col2 = st.columns(2)
+        
+        with case_col1:
+            st.markdown("""
+            #### 배경 및 도전 과제
+            - **업종**: 제조업 (전자제품)
+            - **규모**: 직원 50,000명, 매출 100조원
+            - **도전**: 2030년 탄소 중립 달성 목표
+            
+            #### 추진 전략
+            1. **재생에너지 전환**: 모든 사업장 100% 재생에너지 사용
+            2. **에너지 효율화**: AI 기반 스마트 팩토리 구축
+            3. **공급망 관리**: 협력사 탄소 배출 관리
+            4. **제품 혁신**: 친환경 제품 개발 집중
+            """)
+        
+        with case_col2:
+            st.markdown("""
+            #### 주요 성과
+            - **탄소 배출량**: 2019년 대비 60% 감소
+            - **재생에너지 비율**: 85% 달성
+            - **에너지 효율**: 30% 향상
+            - **비용 절감**: 연간 500억원 절약
+            
+            #### 핵심 성공 요인
+            - 최고경영진의 강력한 의지
+            - 전사적 참여 체계 구축
+            - 기술 혁신과 투자
+            - 이해관계자 협력
+            """)
+        
+        st.success("**교훈**: 명확한 목표 설정과 체계적인 실행이 성공의 핵심")
+    
+    elif case_study == "국내 기업 B":
+        st.markdown("### 🇰🇷 국내 기업 B: ESG 경영 혁신 사례")
         
         st.markdown("""
-        <div class="wiki-text">
-        <strong>주요 실행 방법:</strong>
-        <ul>
-        """, unsafe_allow_html=True)
+        #### 기업 개요
+        - **업종**: 화학 기업
+        - **규모**: 직원 15,000명, 매출 20조원
+        - **특징**: ESG 경영을 통한 기업 가치 혁신
         
-        for method in details['methods']:
-            st.markdown(f"<li>{method}</li>", unsafe_allow_html=True)
+        #### 혁신 과정
+        """)
         
-        st.markdown("</ul></div>", unsafe_allow_html=True)
+        col1, col2, col3 = st.columns(3)
+        
+        with col1:
+            st.markdown("""
+            #### 1단계: 기반 구축
+            - ESG 전담 조직 신설
+            - 경영진 ESG 교육
+            - 정책 및 가이드라인 수립
+            - 이해관계자 맵핑
+            """)
+        
+        with col2:
+            st.markdown("""
+            #### 2단계: 실행 강화
+            - 친환경 제품 개발
+            - 안전 관리 시스템 강화
+            - 지역사회 사회공헌 확대
+            - 지배구조 개선
+            """)
+        
+        with col3:
+            st.markdown("""
+            #### 3단계: 성과 창출
+            - ESG 평가 등급 상승
+            - 주가 상승 효과
+            - 우수 인재 영입
+            - 글로벌 진출 확대
+            """)
+        
+        st.info("**핵심 성과**: MSCI ESG 등급 B → AA 상승, 주가 50% 상승")
 
-elif menu == "3. 성과 지표":
-    st.markdown('<h2 class="wiki-header">3. 성과 지표</h2>', unsafe_allow_html=True)
+# 참고 자료 섹션
+elif selected_section == "참고 자료":
+    st.header("7. 참고 자료")
     
-    st.markdown("""
-    <div class="wiki-text">
-    기업의 경제적 지속발전 가능성을 측정하고 관리하기 위해서는 적절한 성과 지표(Key Performance Indicators, KPI)의 
-    설정과 모니터링이 필수적이다. 이러한 지표들은 재무적 성과뿐만 아니라 비재무적 성과까지 포괄하여 
-    기업의 지속가능성을 다각도로 평가할 수 있도록 한다.
-    </div>
-    """, unsafe_allow_html=True)
+    reference_type = st.selectbox(
+        "자료 유형",
+        ["국제 기준", "국내 법규", "보고서", "도구 및 템플릿"]
+    )
     
-    # 지표 카테고리
-    kpi_categories = {
-        "3.1 재무 지표": [
-            {"name": "매출 성장률", "description": "지속적인 매출 증가율", "target": "연 5-10%", "formula": "(당기매출 - 전기매출) / 전기매출 × 100"},
-            {"name": "수익성 (ROE)", "description": "자기자본 수익률", "target": "15% 이상", "formula": "당기순이익 / 평균자기자본 × 100"},
-            {"name": "현금 흐름", "description": "영업 현금 흐름", "target": "양수 유지", "formula": "영업활동현금흐름 / 매출액 × 100"},
-            {"name": "부채 비율", "description": "총 부채 / 총 자본", "target": "50% 이하", "formula": "총부채 / 총자본 × 100"}
+    if reference_type == "국제 기준":
+        st.markdown("### 🌐 국제 기준 및 가이드라인")
+        
+        standards = {
+            "UN Global Compact": {
+                "설명": "유엔 글로벌 컴팩트 10대 원칙",
+                "분야": "인권, 노동, 환경, 반부패",
+                "링크": "https://www.unglobalcompact.org/"
+            },
+            "GRI Standards": {
+                "설명": "글로벌 지속가능성 보고 표준",
+                "분야": "경제, 환경, 사회 성과 보고",
+                "링크": "https://www.globalreporting.org/"
+            },
+            "SASB Standards": {
+                "설명": "지속가능회계기준위원회 표준",
+                "분야": "산업별 지속가능성 회계 기준",
+                "링크": "https://www.sasb.org/"
+            },
+            "TCFD": {
+                "설명": "기후변화 관련 재무정보 공개 태스크포스",
+                "분야": "기후변화 리스크 공시",
+                "링크": "https://www.fsb-tcfd.org/"
+            },
+            "ISO 26000": {
+                "설명": "사회적 책임 국제 표준",
+                "분야": "사회적 책임 가이드라인",
+                "링크": "https://www.iso.org/iso-26000-social-responsibility.html"
+            }
+        }
+        
+        for name, info in standards.items():
+            with st.expander(f"📋 {name}"):
+                st.markdown(f"""
+                **설명**: {info['설명']}
+                
+                **적용 분야**: {info['분야']}
+                
+                **웹사이트**: {info['링크']}
+                """)
+    
+    elif reference_type == "국내 법규":
+        st.markdown("### 🇰🇷 국내 법규 및 정책")
+        
+        regulations = [
+            "환경영향평가법",
+            "저탄소 녹색성장 기본법",
+            "지속가능발전법",
+            "사회적 가치 기본법",
+            "중대재해처벌법",
+            "ESG 공시 의무화",
+            "K-택소노미"
+        ]
+        
+        for regulation in regulations:
+            st.markdown(f"- **{regulation}**: 지속가능성 관련 주요 법규")
+    
+    elif reference_type == "보고서":
+        st.markdown("### 📊 주요 보고서 및 연구")
+        
+        reports_col1, reports_col2 = st.columns(2)
+        
+        with reports_col1:
+            st.markdown("""
+            #### 글로벌 보고서
+            - **UN SDGs Progress Report**: 지속가능발전목표 진행 상황
+            - **World Economic Forum Global Risks Report**: 글로벌 리스크 분석
+            - **McKinsey Sustainability Report**: 지속가능성 트렌드 분석
+            - **PwC CEO Survey**: CEO 지속가능성 인식 조사
+            
+            #### 환경 관련 보고서
+            - **IPCC Climate Change Report**: 기후변화 과학적 근거
+            - **IEA Energy Transition Report**: 에너지 전환 현황
+            - **CDP Climate Change Report**: 기업 탄소 공시 현황
+            """)
+        
+        with reports_col2:
+            st.markdown("""
+            #### 국내 보고서
+            - **한국거래소 ESG 정보공개 가이던스**: ESG 공시 가이드
+            - **기업지배구조원 ESG 평가**: 국내 기업 ESG 평가
+            - **지속가능발전위원회 K-SDGs**: 한국형 지속가능발전목표
+            - **환경부 녹색경영 가이드**: 환경 경영 실무 가이드
+            
+            #### 산업별 보고서
+            - **제조업 지속가능성 보고서**: 제조업 특화 가이드
+            - **금융업 ESG 가이드**: 금융권 ESG 경영 방향
+            - **IT업계 탄소중립 로드맵**: IT 기업 환경 전략
+            """)
+    
+    elif reference_type == "도구 및 템플릿":
+        st.markdown("### 🛠️ 실무 도구 및 템플릿")
+        
+        tools_tabs = st.tabs(["평가 도구", "계획 템플릿", "보고서 양식"])
+        
+        with tools_tabs[0]:
+            st.markdown("""
+            #### 📝 평가 도구
+            
+            **지속가능성 성숙도 평가 체크리스트**
+            - 현재 지속가능성 수준 진단
+            - 개선 영역 식별
+            - 우선순위 설정 지원
+            
+            **ESG 리스크 평가 매트릭스**
+            - 환경, 사회, 지배구조 리스크 분석
+            - 리스크 수준 평가
+            - 대응 방안 수립
+            
+            **이해관계자 분석 도구**
+            - 주요 이해관계자 식별
+            - 관심사항 및 영향력 분석
+            - 참여 전략 수립
+            """)
+        
+        with tools_tabs[1]:
+            st.markdown("""
+            #### 📋 계획 수립 템플릿
+            
+            **지속가능성 전략 계획서**
+            - 비전 및 목표 설정
+            - 실행 계획 수립
+            - 예산 및 자원 배분
+            
+            **ESG 실행 로드맵**
+            - 단계별 실행 계획
+            - 마일스톤 설정
+            - 책임자 지정
+            
+            **KPI 관리 대시보드**
+            - 핵심 지표 설정
+            - 진행 상황 추적
+            - 성과 분석
+            """)
+        
+        with tools_tabs[2]:
+            st.markdown("""
+            #### 📄 보고서 양식
+            
+            **지속가능성 보고서 템플릿**
+            - GRI 기준 적용
+            - 섹션별 작성 가이드
+            - 데이터 수집 양식
+            
+            **ESG 성과 보고서**
+            - 환경, 사회, 지배구조 성과
+            - 정량적 지표 포함
+            - 개선 계획 명시
+            
+            **이해관계자 보고서**
+            - 이해관계자별 맞춤 보고
+            - 핵심 메시지 전달
+            - 투명성 확보
+            """)
+
+# 추가 기능들
+st.divider()
+
+# 유용한 링크 섹션
+with st.expander("🔗 유용한 링크"):
+    link_col1, link_col2, link_col3 = st.columns(3)
+    
+    with link_col1:
+        st.markdown("""
+        #### 국제 기구
+        - [UN Global Compact](https://www.unglobalcompact.org/)
+        - [GRI](https://www.globalreporting.org/)
+        - [SASB](https://www.sasb.org/)
+        - [TCFD](https://www.fsb-tcfd.org/)
+        """)
+    
+    with link_col2:
+        st.markdown("""
+        #### 국내 기관
+        - [한국거래소](https://www.krx.co.kr/)
+        - [기업지배구조원](https://www.cgs.or.kr/)
+        - [지속가능발전위원회](https://www.ncsd.go.kr/)
+        - [환경부](https://www.me.go.kr/)
+        """)
+    
+    with link_col3:
+        st.markdown("""
+        #### 평가 기관
+        - [MSCI ESG](https://www.msci.com/esg)
+        - [S&P Global ESG](https://www.spglobal.com/esg/)
+        - [Sustainalytics](https://www.sustainalytics.com/)
+        - [CDP](https://www.cdp.net/)
+        """)
+
+# 계산기 도구
+with st.expander("🧮 지속가능성 계산기"):
+    calc_type = st.selectbox("계산기 유형", ["탄소 배출량", "물 사용량", "에너지 효율", "ROI"])
+    
+    if calc_type == "탄소 배출량":
+        st.subheader("탄소 배출량 계산기")
+        
+        calc_col1, calc_col2 = st.columns(2)
+        
+        with calc_col1:
+            electricity = st.number_input("전력 사용량 (kWh/년)", value=0, min_value=0)
+            gas = st.number_input("가스 사용량 (㎥/년)", value=0, min_value=0)
+            oil = st.number_input("유류 사용량 (L/년)", value=0, min_value=0)
+        
+        with calc_col2:
+            # 배출 계수 (단순화된 값)
+            electricity_factor = 0.4781  # kgCO2/kWh
+            gas_factor = 2.176  # kgCO2/㎥
+            oil_factor = 2.58  # kgCO2/L
+            
+            total_emissions = (electricity * electricity_factor + 
+                             gas * gas_factor + 
+                             oil * oil_factor) / 1000  # tCO2로 변환
+            
+            st.metric("연간 총 배출량", f"{total_emissions:.2f} tCO2")
+            st.metric("전력 배출량", f"{electricity * electricity_factor / 1000:.2f} tCO2")
+            st.metric("가스 배출량", f"{gas * gas_factor / 1000:.2f} tCO2")
+            st.metric("유류 배출량", f"{oil * oil_factor / 1000:.2f} tCO2")
+
+# 체크리스트 도구
+with st.expander("✅ 지속가능성 체크리스트"):
+    st.subheader("지속가능성 실행 체크리스트")
+    
+    checklist_categories = {
+        "환경": [
+            "탄소 배출량 측정 및 관리",
+            "에너지 효율 개선 계획",
+            "재생에너지 도입 검토",
+            "폐기물 관리 시스템 구축",
+            "물 사용량 모니터링"
         ],
-        "3.2 혁신 지표": [
-            {"name": "R&D 투자율", "description": "매출 대비 R&D 투자 비율", "target": "3-5%", "formula": "R&D 투자액 / 매출액 × 100"},
-            {"name": "신제품 매출 비중", "description": "신제품 매출 / 총 매출", "target": "20% 이상", "formula": "신제품매출 / 총매출 × 100"},
-            {"name": "특허 출원 건수", "description": "연간 특허 출원 수", "target": "지속적 증가", "formula": "당해연도 특허출원건수"},
-            {"name": "디지털 성숙도", "description": "디지털 전환 수준", "target": "4점/5점", "formula": "디지털전환지수 (5점척도)"}
+        "사회": [
+            "직원 안전 보건 시스템",
+            "다양성 및 포용 정책",
+            "지역사회 기여 활동",
+            "고객 만족도 관리",
+            "공급망 윤리 관리"
         ],
-        "3.3 운영 지표": [
-            {"name": "생산성 지수", "description": "생산량 / 투입 자원", "target": "전년 대비 증가", "formula": "총생산량 / 총투입자원"},
-            {"name": "고객 만족도", "description": "고객 만족 점수", "target": "4.5점/5점", "formula": "고객만족도조사 평균점수"},
-            {"name": "직원 만족도", "description": "직원 만족 점수", "target": "4.0점/5점", "formula": "직원만족도조사 평균점수"},
-            {"name": "시장 점유율", "description": "해당 시장 내 점유율", "target": "유지 또는 증가", "formula": "기업매출 / 전체시장규모 × 100"}
+        "지배구조": [
+            "이사회 독립성 확보",
+            "윤리 경영 시스템",
+            "리스크 관리 체계",
+            "투명성 보고 체계",
+            "이해관계자 소통 채널"
         ]
     }
     
-    # KPI 대시보드
-    st.markdown('<h3 class="wiki-subheader">3.1 핵심 성과 지표 체계</h3>', unsafe_allow_html=True)
-    
-    for category, indicators in kpi_categories.items():
-        st.markdown(f'<h4 class="wiki-subheader">{category}</h4>', unsafe_allow_html=True)
-        
-        # 테이블 형태로 표시
-        st.markdown("""
-        <table class="wiki-table">
-            <tr><th>지표명</th><th>설명</th><th>목표치</th><th>산식</th></tr>
-        """, unsafe_allow_html=True)
-        
-        for indicator in indicators:
-            st.markdown(f"""
-            <tr>
-                <td><strong>{indicator["name"]}</strong></td>
-                <td>{indicator["description"]}</td>
-                <td>{indicator["target"]}</td>
-                <td><code>{indicator["formula"]}</code></td>
-            </tr>
-            """, unsafe_allow_html=True)
-        
-        st.markdown("</table>", unsafe_allow_html=True)
-    
-    # 성과 추이 시뮬레이션
-    st.markdown('<h3 class="wiki-subheader">3.2 성과 추이 분석</h3>', unsafe_allow_html=True)
-    
-    st.markdown("""
-    <div class="wiki-text">
-    다음은 대표적인 기업의 경제적 지속가능성 지표들의 추이를 보여주는 시뮬레이션 결과이다. 
-    이러한 데이터를 통해 기업의 지속가능성 수준을 파악할 수 있다.
-    </div>
-    """, unsafe_allow_html=True)
-    
-    # 샘플 데이터 생성
-    dates = pd.date_range(start='2020-01-01', end='2024-12-31', freq='Q')
-    
-    # 재무 성과 데이터
-    np.random.seed(42)
-    revenue_growth = np.random.normal(7, 2, len(dates))
-    roe = np.random.normal(16, 3, len(dates))
-    rd_investment = np.random.normal(4, 0.5, len(dates))
-    
-    performance_df = pd.DataFrame({
-        '날짜': dates,
-        '매출성장률(%)': revenue_growth,
-        'ROE(%)': roe,
-        'R&D투자율(%)': rd_investment
-    })
-    
-    # 성과 차트
-    fig = go.Figure()
-    
-    fig.add_trace(go.Scatter(
-        x=performance_df['날짜'],
-        y=performance_df['매출성장률(%)'],
-        mode='lines+markers',
-        name='매출성장률(%)',
-        line=dict(color='#0645ad', width=2)
-    ))
-    
-    fig.add_trace(go.Scatter(
-        x=performance_df['날짜'],
-        y=performance_df['ROE(%)'],
-        mode='lines+markers',
-        name='ROE(%)',
-        line=dict(color='#cc0000', width=2)
-    ))
-    
-    fig.add_trace(go.Scatter(
-        x=performance_df['날짜'],
-        y=performance_df['R&D투자율(%)'],
-        mode='lines+markers',
-        name='R&D투자율(%)',
-        line=dict(color='#00aa00', width=2)
-    ))
-    
-    fig.update_layout(
-        title='<b>핵심 성과 지표 추이</b>',
-        xaxis_title='날짜',
-        yaxis_title='비율(%)',
-        height=500,
-        font=dict(family="Helvetica Neue, Helvetica, Arial, sans-serif", size=12),
-        plot_bgcolor='white',
-        paper_bgcolor='white'
-    )
-    
-    st.plotly_chart(fig, use_container_width=True)
+    for category, items in checklist_categories.items():
+        st.markdown(f"#### {category} 영역")
+        for item in items:
+            st.checkbox(item, key=f"check_{category}_{item}")
 
-elif menu == "4. 자가진단":
-    st.markdown('<h2 class="wiki-header">4. 자가진단</h2>', unsafe_allow_html=True)
-    
-    st.markdown("""
-    <div class="wiki-text">
-    기업의 경제적 지속발전 가능성을 객관적으로 평가하기 위한 자가진단 도구이다. 
-    이 진단은 5개 핵심 영역에 대한 20개 항목으로 구성되며
+# 푸터
+st.divider()
+st.markdown("""
+<div style='text-align: center; color: #666; font-size: 0.9em;'>
+    <p>본 가이드는 기업의 지속가능한 발전을 위한 참고 자료입니다.</p>
+    <p>구체적인 실행 계획은 각 기업의 상황에 맞게 조정하여 적용하시기 바랍니다.</p>
+    <p>© 2024 기업 지속 발전 가이드. 지속가능한 미래를 위한 첫 걸음.</p>
+</div>
+""", unsafe_allow_html=True)
